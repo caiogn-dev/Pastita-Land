@@ -7,7 +7,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Pastita | As Melhores Massas',
+  title: 'Pastita | Massas',
   description:
     'Descubra o sabor de massas incríveis. Explore nosso cardápio e peça online para uma experiência deliciosa.',
   keywords: ['massa', 'comida', 'restaurante', 'cardápio online', 'delivery'],

@@ -18,12 +18,10 @@ export default function HomePageClient() {
     <div className="flex flex-col min-h-[100dvh] bg-background">
       <section className="relative w-full h-[80vh] min-h-[600px] flex items-center justify-center text-center text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/60 z-10" />
-        <video
-          src="/homevideo.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
+        <Image
+          src="/banner-site.jpg"
+          alt="Descrição da Imagem do Banner" // Substitua pela descrição real
+          fill // Para que a imagem preencha o container
           className="absolute z-0 w-full h-full object-cover"
         />
         <div className="relative z-20 container px-4 md:px-6 flex flex-col items-center space-y-6">
