@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import Gtm from '@/components/Gtm'; // <-- novo
+import Gtm from '@/components/Gtm';
 
 export const metadata: Metadata = {
   title: 'Pastita | Massas',
@@ -24,6 +24,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="scroll-smooth">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* fontes */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -32,7 +34,7 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
-        {/* Noscript do GTM (melhor prática) */}
+        {/* Noscript do GTM (boa prática) */}
         {gtmId ? (
           <noscript>
             <iframe
@@ -40,11 +42,12 @@ export default function RootLayout({
               height="0"
               width="0"
               style={{ display: 'none', visibility: 'hidden' }}
+              title="gtm-noscript"
             />
           </noscript>
         ) : null}
 
-        {/* GTM/GA4 */}
+        {/* GTM carregado cedo (beforeInteractive + afterInteractive dentro do componente) */}
         <Gtm />
 
         <div className="relative flex min-h-dvh flex-col bg-background">
@@ -55,7 +58,7 @@ export default function RootLayout({
 
         <Toaster />
 
-        {/* Se quiser LGPD/Consent Mode, adicione um banner aqui (ex.: <Consent />) */}
+        {/* (Opcional) Componente de consentimento LGPD/Consent Mode pode vir aqui */}
       </body>
     </html>
   );

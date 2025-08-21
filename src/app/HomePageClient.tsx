@@ -1,5 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,14 +16,28 @@ import { ChevronDown, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-// Use a rota server-side para registrar o clique no GA4 via Measurement Protocol
-// Ajuste as UTMs conforme preferir
+// Roteamento com UTMs para o redirect
 const menuLinkHero = `/r/cardapio?utm_source=site&utm_medium=hero&utm_campaign=cardapio`;
 const menuLinkGrid = `/r/cardapio?utm_source=site&utm_medium=menu_grid&utm_campaign=cardapio`;
 
 export default function HomePageClient() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Envia page_view para o dataLayer a cada troca de rota (SPA)
+  useEffect(() => {
+    const page_location = typeof window !== 'undefined' ? window.location.href : '';
+    const page_title = typeof document !== 'undefined' ? document.title : '';
+    const page_referrer = typeof document !== 'undefined' ? document.referrer : '';
+
+    pushDL('page_view', {
+      page_location,
+      page_title,
+      page_referrer,
+    });
+  }, [pathname, searchParams]);
+
   const onHeroClick = () => {
-    // dispara evento de clique no botão principal antes do redirect
     pushDL('view_menu_click', {
       destination_url: process.env.NEXT_PUBLIC_MENU_DEST,
       utm_source: 'site',
@@ -29,7 +46,7 @@ export default function HomePageClient() {
       button_name: 'Peça Agora no Anota.ai Hero',
     });
 
-    // mantém seu evento custom existente (compatível)
+    // opcional: manter seu evento custom paralelo
     track('cta_click', { button_name: 'Peça Agora no Anota.ai Hero' });
   };
 
@@ -167,9 +184,7 @@ export default function HomePageClient() {
               onClick={onGridClick}
               className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-semibold px-10 py-7 rounded-full shadow-md"
             >
-              <Link href={menuLinkGrid}>
-                Ver Cardápio Completo e Peça Já
-              </Link>
+              <Link href={menuLinkGrid}>Ver Cardápio Completo e Peça Já</Link>
             </Button>
           </div>
         </div>
