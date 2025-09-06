@@ -3,8 +3,13 @@
 import { useEffect, useState } from 'react';
 // Função para disparar evento GA4
 function sendGAEvent(event: string, params: Record<string, any> = {}) {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', event, params);
+  if (typeof window !== 'undefined') {
+    if (window.gtag) {
+      window.gtag('event', event, params);
+      console.log('[GA4] Evento enviado:', event, params);
+    } else {
+      console.warn('[GA4] gtag não está disponível no momento do envio:', event, params);
+    }
   }
 }
 
@@ -34,7 +39,10 @@ function CupomModal({ open, onClose }: { open: boolean; onClose: () => void }) {
       } else {
         setStatus('error');
       }
-      sendGAEvent('lead_celular_cupom', { phone, status: data.status });
+      // Aguarda o GA carregar antes de enviar o evento
+      setTimeout(() => {
+        sendGAEvent('lead_celular_cupom', { phone, status: data.status });
+      }, 500);
     } catch (err) {
       setError('Erro ao enviar. Tente novamente.');
       setStatus('error');
