@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import Gtm from '@/components/Gtm';
+import GaClient from '@/components/GaClient';
 
 export const metadata: Metadata = {
   title: 'Pastita | Massas',
@@ -19,7 +19,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+  // GTM removido, só Analytics
 
   return (
     <html lang="pt-BR" className="scroll-smooth">
@@ -34,28 +34,15 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
-        {/* Noscript do GTM (boa prática) */}
-        {gtmId ? (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-              height="0"
-              width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
-              title="gtm-noscript"
-            />
-          </noscript>
-        ) : null}
 
-        {/* GTM carregado cedo (beforeInteractive + afterInteractive dentro do componente) */}
-        <Gtm />
+  {/* Google Analytics carregado em todas as páginas */}
+  <GaClient gaId={process.env.NEXT_PUBLIC_GA_ID} />
+
 
         <div className="relative flex min-h-dvh flex-col bg-background">
-          
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
-
         <Toaster />
 
         {/* (Opcional) Componente de consentimento LGPD/Consent Mode pode vir aqui */}

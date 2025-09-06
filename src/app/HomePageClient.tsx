@@ -20,7 +20,7 @@ function CupomModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:5678/webhook-test/gptmaker-pastita-in', {
+      const res = await fetch('https://n8n-service-wj7k.onrender.com/webhook/gptmaker-pastita-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone }),

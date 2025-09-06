@@ -1,10 +1,8 @@
 'use client'
 import Script from 'next/script'
 
-export default function Ga() {
-  const gaId = process.env.NEXT_PUBLIC_GA_ID // coloque seu G-QBD0XRBEF1 no .env
-  if (!gaId) return null
-
+export default function Ga({ gaId }: { gaId: string | undefined }) {
+  if (!gaId) return null;
   return (
     <>
       <Script
@@ -20,5 +18,5 @@ export default function Ga() {
         `}
       </Script>
     </>
-  )
+  );
 }
