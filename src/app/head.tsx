@@ -16,7 +16,7 @@ export default function Head() {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-MWC3H6H1BJ');
+            gtag('config', 'G-FX1387G6DS');
           `
         }} />
     </>
