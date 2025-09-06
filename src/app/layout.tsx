@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-// import GaClient from '@/components/GaClient';
 
 export const metadata: Metadata = {
   title: 'Pastita | Massas',
@@ -31,7 +30,7 @@ export default function RootLayout({
 
         <div className="relative flex min-h-dvh flex-col bg-background">
           <main className="flex-1">{children}</main>
-          <Footer />
+    <Footer />
         </div>
         <Toaster />
 
