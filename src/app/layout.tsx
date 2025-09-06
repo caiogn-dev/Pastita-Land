@@ -22,18 +22,27 @@ export default function RootLayout({
 
   return (
     <html lang="pt-BR" className="scroll-smooth">
-  {/* <head> removido, agora controlado por app/head.tsx */}
+      {/* Google Analytics 4 via next/script */}
+      <head>
+        {/* Google Analytics 4 */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-F6RDSM45Q0"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-F6RDSM45Q0');
+            `,
+          }}
+        />
+      </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
-
-  {/* Google Analytics e fontes agora estão em app/head.tsx */}
-
-
         <div className="relative flex min-h-dvh flex-col bg-background">
           <main className="flex-1">{children}</main>
-    <Footer />
+          <Footer />
         </div>
         <Toaster />
-
         {/* (Opcional) Componente de consentimento LGPD/Consent Mode pode vir aqui */}
       </body>
     </html>
