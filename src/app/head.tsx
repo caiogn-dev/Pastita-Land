@@ -10,13 +10,13 @@ export default function Head() {
         rel="stylesheet"
       />
         {/* Google Analytics 4 tag padrão */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-MWC3H6H1BJ"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-F6RDSM45Q0"></script>
         <script dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-MWC3H6H1BJ');
+            gtag('config', 'G-F6RDSM45Q0');
           `
         }} />
     </>
