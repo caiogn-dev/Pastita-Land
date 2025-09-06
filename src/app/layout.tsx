@@ -23,40 +23,10 @@ export default function RootLayout({
 
   return (
     <html lang="pt-BR" className="scroll-smooth">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* fontes */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+  {/* <head> removido, agora controlado por app/head.tsx */}
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
 
-  {/* Google Analytics carregado em todas as páginas */}
-  {/* Google tag (gtag.js) - inserido diretamente no head */}
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {/* fontes */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    {/* Google Analytics 4 tag padrão */}
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MWC3H6H1BJ"></script>
-    <script dangerouslySetInnerHTML={{
-      __html: `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-MWC3H6H1BJ');
-      `
-    }} />
-  </head>
+  {/* Google Analytics e fontes agora estão em app/head.tsx */}
 
 
         <div className="relative flex min-h-dvh flex-col bg-background">
