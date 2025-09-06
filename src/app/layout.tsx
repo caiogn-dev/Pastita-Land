@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import GaClient from '@/components/GaClient';
+// import GaClient from '@/components/GaClient';
 
 export const metadata: Metadata = {
   title: 'Pastita | Massas',
@@ -36,7 +36,27 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
 
   {/* Google Analytics carregado em todas as páginas */}
-  <GaClient gaId={process.env.NEXT_PUBLIC_GA_ID} />
+  {/* Google tag (gtag.js) - inserido diretamente no head */}
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* fontes */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    {/* Google Analytics 4 tag padrão */}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MWC3H6H1BJ"></script>
+    <script dangerouslySetInnerHTML={{
+      __html: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-MWC3H6H1BJ');
+      `
+    }} />
+  </head>
 
 
         <div className="relative flex min-h-dvh flex-col bg-background">
