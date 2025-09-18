@@ -9,11 +9,11 @@ export function AgriaoLogo() {
       prefetch={false}
     >
       <Image 
-        src="/images/menu-agriao/logo-agriao.png" // coloque o logo desejado aqui
+        src="/agriao-logo.png" // ou .png conforme o arquivo real
         alt="Logo Agriao" 
-        width={100}
-        height={32}
-        className="drop-shadow-md h-8 w-auto max-w-[100px]"
+        width={120}
+        height={120}
+        className="drop-shadow-md object-contain"
         priority
       />
     </Link>
