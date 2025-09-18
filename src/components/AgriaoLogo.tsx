@@ -9,11 +9,11 @@ export function AgriaoLogo() {
       prefetch={false}
     >
       <Image 
-        src="/agriao-logo2.png" // ou .png conforme o arquivo real
+        src="/agriao-logo2.png"
         alt="Logo Agriao" 
-        width={120}
-        height={120}
-        className="drop-shadow-md object-contain"
+        width={100}
+        height={32}
+        className="drop-shadow-md h-8 w-auto max-w-[100px]"
         priority
       />
     </Link>

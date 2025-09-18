@@ -348,7 +348,7 @@ export default function CardapioAgriao() {
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex items-center justify-between gap-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center h-15 w-12">
+              <div className="flex items-center justify-center h-10 w-10">
                 <AgriaoLogo />
               </div>
               <div className="ml-2">
