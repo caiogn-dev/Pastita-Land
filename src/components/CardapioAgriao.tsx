@@ -336,27 +336,31 @@ export default function CardapioAgriao() {
   const itemCount = items.reduce((acc, it) => acc + it.qty, 0);
   return (
     <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      {/* Botão flutuante do carrinho */}
       <CartButtonFloating
         onClick={() => setOpenCart(true)}
         itemCount={itemCount}
       />
       <CartModal open={openCart} onClose={() => setOpenCart(false)} />
-      <header className="bg-green-700 border-b border-green-800 shadow-md">
+
+      {/* Header - igual ao Pastita, mas verde */}
+      <header className="sticky top-0 z-30 bg-green-700 border-b border-green-800 shadow-md">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex items-center justify-between gap-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="h-[60px] w-[110px] flex items-center justify-center">
+              <div className="flex items-center justify-center h-15 w-12">
                 <AgriaoLogo />
               </div>
               <div className="ml-2">
                 <h1 className="text-lg font-semibold text-white drop-shadow">
-                  Cardápio Agriao Marmitas
+                  Cardápio
                 </h1>
                 <p className="text-xs text-green-200">
                   Escolha seus pratos favoritos e monte seu pedido!
                 </p>
               </div>
             </div>
+            {/* Campo de busca */}
             <div className="w-full max-w-sm">
               <input
                 type="search"
@@ -369,6 +373,8 @@ export default function CardapioAgriao() {
           </div>
         </div>
       </header>
+
+      {/* Category Pills */}
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex gap-2 overflow-x-auto py-4">
           <CategoryPill
@@ -386,6 +392,8 @@ export default function CardapioAgriao() {
           ))}
         </div>
       </div>
+
+      {/* Menu sections */}
       <section className="mx-auto max-w-6xl px-4 pb-16">
         {visibleCategories.map((category) => {
           const these = filtered.filter((i: any) => i.__catId === category.id);
@@ -411,12 +419,16 @@ export default function CardapioAgriao() {
             </div>
           );
         })}
+
+        {/* Empty state */}
         {filtered.length === 0 && (
           <div className="py-20 text-center text-green-600">
             Nenhum item encontrado para "{query}".
           </div>
         )}
       </section>
+
+      {/* Footer */}
       <footer className="border-t border-green-200 bg-white/70">
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-green-600">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">

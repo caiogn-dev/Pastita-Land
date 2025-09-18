@@ -9,7 +9,7 @@ export function AgriaoLogo() {
       prefetch={false}
     >
       <Image 
-        src="/agriao-logo.png" // ou .png conforme o arquivo real
+        src="/agriao-logo2.png" // ou .png conforme o arquivo real
         alt="Logo Agriao" 
         width={120}
         height={120}
