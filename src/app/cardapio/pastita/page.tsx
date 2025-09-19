@@ -298,7 +298,7 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     }
   };
 
-  const WHATS_PHONE = "5561999999999"; // TODO: coloque o número real (apenas dígitos)
+  const WHATS_PHONE = "5563991386719"; // TODO: coloque o número real (apenas dígitos)
 
   const whatsappHref = useMemo(() => {
     return buildWhatsappUrl({
