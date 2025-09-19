@@ -23,6 +23,45 @@ const CURRENCY = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 /* =============================
+   GA4 helpers (inline) // NEW
+============================= */
+function pushDL(event: string, params: Record<string, any> = {}) {
+  if (typeof window === "undefined") return;
+  // @ts-ignore
+  window.dataLayer = window.dataLayer || [];
+  // @ts-ignore
+  window.dataLayer.push({ event, ...params });
+}
+function gaEvent(name: string, params: Record<string, any> = {}) { // NEW
+  if (typeof window === "undefined") return;
+  // @ts-ignore
+  window.gtag?.("event", name, params);
+  pushDL(name, params);
+}
+
+/* =============================
+   WhatsApp helper + UTMs // NEW
+============================= */
+function buildWhatsappUrl({ // NEW
+  phone,  // "5561999999999"
+  text,
+  utm = { source: "site", medium: "whatsapp", campaign: "pastita", content: "cart-modal" },
+}: {
+  phone: string;
+  text: string;
+  utm?: { source?: string; medium?: string; campaign?: string; content?: string };
+}) {
+  const base = `https://wa.me/${phone.replace(/\D/g, "")}`;
+  const url = new URL(base);
+  url.searchParams.set("text", text || "Olá! Quero fazer um pedido.");
+  if (utm.source)   url.searchParams.set("utm_source", utm.source);
+  if (utm.medium)   url.searchParams.set("utm_medium", utm.medium);
+  if (utm.campaign) url.searchParams.set("utm_campaign", utm.campaign);
+  if (utm.content)  url.searchParams.set("utm_content", utm.content);
+  return url.toString();
+}
+
+/* =============================
    Cart — contexto + storage
 ============================= */
 type CartItem = MenuItem & { qty: number };
@@ -61,12 +100,30 @@ function CartProvider({ children }: { children: React.ReactNode }) {
   const add = useCallback((item: MenuItem) => {
     setItems((prev) => {
       const ix = prev.findIndex((x) => x.id === item.id);
-      if (ix >= 0) {
-        const clone = [...prev];
-        clone[ix] = { ...clone[ix], qty: clone[ix].qty + 1 };
-        return clone;
-      }
-      return [...prev, { ...item, qty: 1 }];
+      const next =
+        ix >= 0
+          ? (() => {
+              const clone = [...prev];
+              clone[ix] = { ...clone[ix], qty: clone[ix].qty + 1 };
+              return clone;
+            })()
+          : [...prev, { ...item, qty: 1 }];
+
+      // GA4: add_to_cart // NEW
+      gaEvent("add_to_cart", {
+        currency: "BRL",
+        value: Number(item.price.toFixed(2)),
+        items: [
+          {
+            item_id: String(item.id),
+            item_name: item.name,
+            price: Number(item.price.toFixed(2)),
+            quantity: 1,
+          },
+        ],
+      });
+
+      return next;
     });
   }, []);
 
@@ -209,9 +266,35 @@ function buildOrderBlock(items: CartItem[], total: number) {
   return lines.join("\n");
 }
 
+/* =============================
+   GA mapping helpers // NEW
+============================= */
+function cartToGa4Items(items: CartItem[]) { // NEW
+  return items.map((it, index) => ({
+    item_id: String(it.id),
+    item_name: it.name,
+    index,
+    price: Number(it.price.toFixed(2)),
+    quantity: it.qty,
+  }));
+}
+
+/* =============================
+   Cart Modal (com CTA WhatsApp)
+============================= */
 function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { items, total, remove, clear } = useCart();
   const block = useMemo(() => buildOrderBlock(items, total), [items, total]);
+
+  // Disparar view_cart ao abrir o modal // NEW
+  useEffect(() => {
+    if (!open) return;
+    gaEvent("view_cart", {
+      currency: "BRL",
+      value: Number(total.toFixed(2)),
+      items: cartToGa4Items(items),
+    });
+  }, [open, items, total]);
 
   const copyBlock = async () => {
     try {
@@ -229,13 +312,37 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     }
   };
 
-  const whatsappHref = useMemo(() => {
-    const phone = ""; // 👉 DDI+DDD+número (ex.: 5563999999999)
-    const text = encodeURIComponent(block);
-    return phone
-      ? `https://wa.me/${phone}?text=${text}`
-      : `https://wa.me/?text=${text}`;
+  const WHATS_PHONE = "5561999999999"; // TODO: coloque o número real (somente dígitos) // NEW
+
+  const whatsappHref = useMemo(() => { // NEW
+    return buildWhatsappUrl({
+      phone: WHATS_PHONE,
+      text: block,
+      utm: {
+        source: "site",
+        medium: "whatsapp",
+        campaign: "pastita",
+        content: "cart-modal",
+      },
+    });
   }, [block]);
+
+  const onFinishClick = () => { // NEW
+    // GA4: begin_checkout + generate_lead
+    gaEvent("begin_checkout", {
+      currency: "BRL",
+      value: Number(total.toFixed(2)),
+      items: cartToGa4Items(items),
+    });
+    gaEvent("generate_lead", {
+      destination: "whatsapp",
+      channel: "whatsapp",
+      placement: "cart-modal",
+      loja: "pastita",
+      value: Number(total.toFixed(2)),
+      currency: "BRL",
+    });
+  };
 
   return (
     <Modal open={open} onClose={onClose} title="Seu pedido">
@@ -311,6 +418,8 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
             <a
               href={whatsappHref}
               target="_blank"
+              rel="noopener noreferrer"
+              onClick={onFinishClick} // NEW
               className="flex-1 text-center rounded-xl bg-rose-600 text-white hover:bg-rose-700 py-3 text-base font-semibold shadow transition"
             >
               Finalizar pelo WhatsApp

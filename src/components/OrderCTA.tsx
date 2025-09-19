@@ -1,60 +1,37 @@
 'use client';
-import Link from 'next/link';
+import { buildWhatsappUrl } from '@/lib/wa';
 import { gaEvent } from '@/lib/events';
 
-type Props = {
-  label?: string;
-  href: string;            // link do anota.ai
-  menu: 'pastita' | 'agriao';
-  placement:
-    | 'hero'
-    | 'header'
-    | 'sticky'
-    | 'category'
-    | 'footer'
-    | 'home-card';
-  className?: string;
-};
-
-function withUTM(url: string, menu: string, placement: string) {
-  try {
-    const u = new URL(url);
-    // não sobrescreve query existente
-    u.searchParams.set('utm_source', 'site');
-    u.searchParams.set('utm_medium', 'cta');
-    u.searchParams.set('utm_campaign', `${menu}-cardapio`);
-    u.searchParams.set('utm_content', placement);
-    return u.toString();
-  } catch {
-    return url;
-  }
-}
-
-export default function OrderCTA({
-  label = 'Peça agora',
-  href,
-  menu,
-  placement,
+export function WhatsappCTA({
+  phone,
+  label = 'Pedir no WhatsApp',
+  message = 'Olá! Quero fazer um pedido.',
+  utm = { source: 'site', medium: 'cta', campaign: 'pedido', content: 'header' },
   className = ''
-}: Props) {
-  const finalHref = withUTM(href, menu, placement);
+}: {
+  phone: string;
+  label?: string;
+  message?: string;
+  utm?: { source?: string; medium?: string; campaign?: string; content?: string };
+  className?: string;
+}) {
+  const href = buildWhatsappUrl({ phone, text: message, utm });
 
   return (
-    <Link
-      href={finalHref}
-      prefetch={false}
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       className={`inline-flex items-center justify-center rounded-xl px-5 py-3 text-base font-medium bg-primary text-primary-foreground hover:opacity-90 transition ${className}`}
       onClick={() =>
         gaEvent('generate_lead', {
           destination: 'whatsapp',
-          menu,
-          placement
+          channel: 'whatsapp',
+          placement: utm.content || 'cta'
         })
       }
-      target="_blank"
-      rel="noopener noreferrer"
     >
       {label}
-    </Link>
+    </a>
   );
 }
