@@ -2,12 +2,21 @@
 
 import Script from 'next/script';
 
+const ID_FROM_ENV = process.env.NEXT_PUBLIC_GA_ID; // injetado no build
+
 export default function Ga({ gaId }: { gaId?: string }) {
-  if (!gaId) return null;
+  const id = gaId || ID_FROM_ENV; // fallback para a env
+
+  if (!id) {
+    if (typeof window !== 'undefined') {
+      console.warn('[GA] NEXT_PUBLIC_GA_ID ausente. Verifique .env.local e reinicie o servidor.');
+    }
+    return null;
+  }
 
   return (
     <>
-      {/* Consent default (LGPD) — pode ligar seu banner e chamar 'update' depois */}
+      {/* Consent default (LGPD) */}
       <Script id="consent-default" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
@@ -23,7 +32,7 @@ export default function Ga({ gaId }: { gaId?: string }) {
 
       {/* GA4 */}
       <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${id}`}
         strategy="afterInteractive"
       />
       <Script id="ga-setup" strategy="afterInteractive">
@@ -31,7 +40,9 @@ export default function Ga({ gaId }: { gaId?: string }) {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${gaId}');
+          gtag('config', '${id}', {
+            debug_mode: ${process.env.NODE_ENV !== 'production'}
+          });
         `}
       </Script>
     </>

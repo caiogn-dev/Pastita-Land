@@ -126,7 +126,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
         </div>
         <Toaster />
-        <Ga gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        <Ga  />
       </body>
     </html>
   );
