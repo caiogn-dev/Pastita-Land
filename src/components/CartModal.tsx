@@ -8,7 +8,7 @@ import { cartToGa4Items } from '@/lib/cartMessage';
   {/* Botão principal */}
   <CartWhatsappCTA
     loja="pastita"                // ou "agriao" nessa página
-    phone="5561999999999"        // número real da loja
+    phone="5563991386719"        // número real da loja
     className="h-12"
   />
   {/* Botão secundário (ex.: continuar comprando) */}
