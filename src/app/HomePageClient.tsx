@@ -56,7 +56,7 @@ export default function HomePageClient() {
       </div>
       {/* Botão flutuante WhatsApp */}
       <a
-        href="https://wa.me/SEUNUMEROAQUI?text=Olá! Gostaria de fazer um pedido."
+        href="https://wa.me/+5563991386719?text=Olá! Gostaria de fazer um pedido."
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-24 right-6 z-50 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-xl flex items-center gap-3 px-5 py-3 text-lg font-bold transition-all border-2 border-white animate-bounce-slow"
@@ -65,7 +65,7 @@ export default function HomePageClient() {
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 mr-2">
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 9.75v.008h.008M12 3.75c-4.694 0-8.25 3.556-8.25 8.25 0 1.53.417 2.97 1.21 4.22L3 21l4.03-1.21A8.19 8.19 0 0 0 12 20.25c4.694 0 8.25-3.556 8.25-8.25s-3.556-8.25-8.25-8.25z" />
         </svg>
-        WhatsApp
+        Fale Conosco
       </a>
       {/* Animações CSS */}
       <style jsx>{`

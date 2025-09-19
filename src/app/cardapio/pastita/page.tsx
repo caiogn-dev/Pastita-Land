@@ -23,7 +23,7 @@ const CURRENCY = (value: number) =>
    WhatsApp helper + UTMs
 ============================= */
 function buildWhatsappUrl({
-  phone, // "5561999999999"
+  phone = "5563991386719",
   text,
   utm = {
     source: "site",
