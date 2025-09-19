@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pastita.com.br/sitemap.xml

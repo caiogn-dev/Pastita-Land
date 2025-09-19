@@ -1,6 +1,8 @@
 export default function Head() {
   return (
     <>
+      <title>Monte seu pedido! | Pastita</title>
+      <meta name="description" content="Escolha entre Pastita ou Agrião e aproveite o melhor da comida artesanal e saudável." />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       {/* fontes */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />

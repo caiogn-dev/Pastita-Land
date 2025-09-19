@@ -16,6 +16,7 @@ import {
 } from "@/data/menu.updated";
 import { AgriaoLogo } from "@/components/AgriaoLogo";
 import { ShoppingCart } from "lucide-react";
+import Image from "next/image";
 
 const CURRENCY = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -29,7 +30,7 @@ type CartState = {
   total: number;
 };
 const CartCtx = createContext<CartState | null>(null);
-function useCart() {
+export function useCart() {
   const ctx = useContext(CartCtx);
   if (!ctx) throw new Error("Cart context missing");
   return ctx;
@@ -90,9 +91,11 @@ function ItemCardAgriao({ item }: { item: MenuItem }) {
   return (
     <div className="group overflow-hidden rounded-2xl border border-green-200 shadow-sm bg-white dark:bg-zinc-900">
       <div className="aspect-[4/3] w-full bg-green-50 dark:bg-green-900">
-        <img
-          src={item.imageUrl || PLACEHOLDER}
+        <Image
+          src={item.imageFile ? `/imagens/${item.imageFile}` : item.imageUrl || PLACEHOLDER}
           alt={item.name}
+          width={400}
+          height={300}
           className="h-full w-full object-cover"
         />
       </div>
@@ -433,8 +436,7 @@ export default function CardapioAgriao() {
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-green-600">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p>
-              © {new Date().getFullYear()} Agriao Marmitas — Template Next.js.
-              Atualize as fotos e valores quando quiser.
+              © {new Date().getFullYear()} Agriao Marmitas — Todos direitos reservados.
             </p>
             <a href="/" className="hover:underline text-green-700">
               Voltar ao início

@@ -13,15 +13,7 @@ export function Footer() {
       </div>
       <nav className="flex justify-center w-full gap-6 mt-2">
         <Link
-          href="#"
-          className="text-xs text-muted-foreground hover:text-primary transition-colors"
-          prefetch={false}
-          aria-label="Twitter"
-        >
-          <Twitter className="h-5 w-5" />
-        </Link>
-        <Link
-          href="#"
+          href="https://www.facebook.com/pastita.agriao/"
           className="text-xs text-muted-foreground hover:text-primary transition-colors"
           prefetch={false}
           aria-label="Facebook"
@@ -29,7 +21,7 @@ export function Footer() {
           <Facebook className="h-5 w-5" />
         </Link>
         <Link
-          href="#"
+          href="https://www.instagram.com/pastita.agriao/"
           className="text-xs text-muted-foreground hover:text-primary transition-colors"
           prefetch={false}
           aria-label="Instagram"

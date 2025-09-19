@@ -12,26 +12,29 @@ const OG_IMAGE = "/Logo-site.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "Pastita | Massas", template: "%s | Pastita" },
-  description: "Massas artesanais e pratos saudáveis. Explore os cardápios e peça online.",
+  title: "Pastita | Agrião",
+  description: "Pastita e Agrião: massas artesanais, marmitas fitness, comida saudável, delivery em Palmas. Veja o cardápio completo e peça online.",
   keywords: [
-    "massa","massas artesanais","rondelli","nhoque",
-    "comida saudável","delivery","restaurante","marmitas","fitness","agriao marmitas","marmitas fitness"
+    "massa artesanal", "pastita", "massas frescas", "rondelli", "nhoque", "canelone", "marmita fitness", "comida saudável", "delivery Palmas", "restaurante Palmas", "cardápio Pastita", "cardápio Agriao", "marmitas naturais", "molhos artesanais", "kit família", "kit casal", "chef Ivoneth", "agriao marmitas"
   ],
-  alternates: { canonical: "/" },
+  alternates: { canonical: SITE_URL },
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     url: SITE_URL,
-    title: "Pastita | Massas",
-    description: "Massas artesanais e pratos saudáveis. Explore os cardápios e peça online.",
-    images: [{ url: OG_IMAGE, width: 1200, height: 630 }],
+    title: "Pastita | Massas - Cardápio de massas artesanais, marmitas fitness e comida saudável",
+    description: "Pastita Massas: massas artesanais, marmitas fitness, comida saudável, delivery em Palmas. Veja o cardápio completo e peça online.",
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Logo Pastita Massas" }],
+    siteName: "Pastita Massas",
+    locale: "pt_BR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pastita | Massas",
-    description: "Massas artesanais e pratos saudáveis. Explore os cardápios e peça online.",
+    title: "Pastita | Massas - Cardápio de massas artesanais, marmitas fitness e comida saudável",
+    description: "Pastita Massas: massas artesanais, marmitas fitness, comida saudável, delivery em Palmas. Veja o cardápio completo e peça online.",
     images: [OG_IMAGE],
+    creator: "@pastitamassas",
+    site: "@pastitamassas"
   },
   icons: {
     icon: "/favicon.ico",
@@ -40,7 +43,6 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   verification: {
-    // se tiver códigos de verificação:
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 };

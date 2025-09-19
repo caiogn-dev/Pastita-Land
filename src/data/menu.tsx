@@ -1,6 +1,16 @@
 // Imagem placeholder global para os itens do menu
 export const PLACEHOLDER = "https://placehold.co/450x350.png";
 
+// Tipo para itens do menu
+export type MenuItem = {
+  id: string;
+  name: string;
+  price: number;
+  description?: string;
+  imageUrl?: string;
+  tags?: string[];
+};
+
 // Exporte um array de categorias de menu
 export const CATEGORIES = [
   {
