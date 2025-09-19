@@ -7,7 +7,7 @@ import { Footer } from '@/components/Footer';
 import Ga from '@/components/Ga';
 
 const SITE_URL = 'https://pastita.com.br';
-const OG_IMAGE = '/Logo-site.png'; // coloque esse arquivo em /public (ideal: 1200x630)
+const OG_IMAGE = '/Logo-site.png'; // 1200x630 recomendado
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -37,11 +37,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // defina seus números reais (somente dígitos, com DDI 55)
+  // números reais (somente dígitos, com DDI 55)
   const WHATS_PASTITA = '5561999999999';
   const WHATS_AGRIAO  = '5561888888888';
 
-  // JSON-LD globais: Organization + 2 Restaurants com OrderAction via WhatsApp
   const jsonLd = [
     {
       '@context': 'https://schema.org',
@@ -102,8 +101,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className="scroll-smooth">
       <head>
         {/* JSON-LD global */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        {/* Consent Mode default (LGPD) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {/* Consent Mode default (LGPD) — mantenha apenas aqui (não no Ga.tsx) */}
         <script
           id="consent-default"
           dangerouslySetInnerHTML={{
@@ -126,7 +128,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
         </div>
         <Toaster />
-        <Ga  />
+        {/* GA4 via env (NEXT_PUBLIC_GA_ID) */}
+        <Ga />
       </body>
     </html>
   );
