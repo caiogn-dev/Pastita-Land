@@ -8,7 +8,7 @@ import Script from "next/script";
 import { Suspense } from "react";
 
 const SITE_URL = "https://pastita.com.br";
-const OG_IMAGE = "/Logo-site.png";
+const OG_IMAGE = "/pastita-logo.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
