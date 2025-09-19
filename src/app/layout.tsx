@@ -1,10 +1,9 @@
-// app/layout.tsx
 import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import Ga from '@/components/Ga';
 
 export const metadata: Metadata = {
   title: 'Pastita | Massas',
@@ -18,32 +17,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // GTM removido, só Analytics
-
   return (
     <html lang="pt-BR" className="scroll-smooth">
-      {/* Google Analytics 4 via next/script */}
-      <head>
-        {/* Google Analytics 4 */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-F6RDSM45Q0"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-F6RDSM45Q0');
-            `,
-          }}
-        />
-      </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
         <div className="relative flex min-h-dvh flex-col bg-background">
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
         <Toaster />
-        {/* (Opcional) Componente de consentimento LGPD/Consent Mode pode vir aqui */}
+
+        {/* Google Analytics 4 via componente e ENV */}
+        <Ga gaId={process.env.NEXT_PUBLIC_GA_ID} />
       </body>
     </html>
   );
