@@ -8,13 +8,10 @@ import React, {
   createContext,
   useContext,
 } from "react";
-import {
-  CATEGORIES,
-  PLACEHOLDER,
-  type MenuItem,
-} from "@/data/menu";
+import { CATEGORIES, PLACEHOLDER, type MenuItem } from "@/data/menu";
 import { PastitaLogo } from "@/components/PastitaLogo";
 import { ShoppingCart } from "lucide-react";
+import { event as gaEvent } from "@/lib/ga"; // ✅ usar helper único
 
 /* =============================
    Utils
@@ -23,29 +20,17 @@ const CURRENCY = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 /* =============================
-   GA4 helpers (inline) // NEW
+   WhatsApp helper + UTMs
 ============================= */
-function pushDL(event: string, params: Record<string, any> = {}) {
-  if (typeof window === "undefined") return;
-  // @ts-ignore
-  window.dataLayer = window.dataLayer || [];
-  // @ts-ignore
-  window.dataLayer.push({ event, ...params });
-}
-function gaEvent(name: string, params: Record<string, any> = {}) { // NEW
-  if (typeof window === "undefined") return;
-  // @ts-ignore
-  window.gtag?.("event", name, params);
-  pushDL(name, params);
-}
-
-/* =============================
-   WhatsApp helper + UTMs // NEW
-============================= */
-function buildWhatsappUrl({ // NEW
-  phone,  // "5561999999999"
+function buildWhatsappUrl({
+  phone, // "5561999999999"
   text,
-  utm = { source: "site", medium: "whatsapp", campaign: "pastita", content: "cart-modal" },
+  utm = {
+    source: "site",
+    medium: "whatsapp",
+    campaign: "pastita",
+    content: "cart-modal",
+  },
 }: {
   phone: string;
   text: string;
@@ -54,10 +39,10 @@ function buildWhatsappUrl({ // NEW
   const base = `https://wa.me/${phone.replace(/\D/g, "")}`;
   const url = new URL(base);
   url.searchParams.set("text", text || "Olá! Quero fazer um pedido.");
-  if (utm.source)   url.searchParams.set("utm_source", utm.source);
-  if (utm.medium)   url.searchParams.set("utm_medium", utm.medium);
+  if (utm.source) url.searchParams.set("utm_source", utm.source);
+  if (utm.medium) url.searchParams.set("utm_medium", utm.medium);
   if (utm.campaign) url.searchParams.set("utm_campaign", utm.campaign);
-  if (utm.content)  url.searchParams.set("utm_content", utm.content);
+  if (utm.content) url.searchParams.set("utm_content", utm.content);
   return url.toString();
 }
 
@@ -109,7 +94,7 @@ function CartProvider({ children }: { children: React.ReactNode }) {
             })()
           : [...prev, { ...item, qty: 1 }];
 
-      // GA4: add_to_cart // NEW
+      // GA4: add_to_cart
       gaEvent("add_to_cart", {
         currency: "BRL",
         value: Number(item.price.toFixed(2)),
@@ -219,6 +204,9 @@ function ItemCard({ item }: { item: MenuItem }) {
   );
 }
 
+/* =============================
+   Modal
+============================= */
 function Modal({
   open,
   onClose,
@@ -267,9 +255,9 @@ function buildOrderBlock(items: CartItem[], total: number) {
 }
 
 /* =============================
-   GA mapping helpers // NEW
+   GA mapping helpers
 ============================= */
-function cartToGa4Items(items: CartItem[]) { // NEW
+function cartToGa4Items(items: CartItem[]) {
   return items.map((it, index) => ({
     item_id: String(it.id),
     item_name: it.name,
@@ -286,7 +274,7 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { items, total, remove, clear } = useCart();
   const block = useMemo(() => buildOrderBlock(items, total), [items, total]);
 
-  // Disparar view_cart ao abrir o modal // NEW
+  // GA4: view_cart ao abrir o modal
   useEffect(() => {
     if (!open) return;
     gaEvent("view_cart", {
@@ -301,9 +289,7 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
       await navigator.clipboard.writeText(block);
       alert("Resumo copiado! Cole no WhatsApp ou checkout.");
     } catch {
-      const el = document.getElementById(
-        "order-block"
-      ) as HTMLTextAreaElement | null;
+      const el = document.getElementById("order-block") as HTMLTextAreaElement | null;
       if (el) {
         el.select();
         document.execCommand("copy");
@@ -312,9 +298,9 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     }
   };
 
-  const WHATS_PHONE = "5561999999999"; // TODO: coloque o número real (somente dígitos) // NEW
+  const WHATS_PHONE = "5561999999999"; // TODO: coloque o número real (apenas dígitos)
 
-  const whatsappHref = useMemo(() => { // NEW
+  const whatsappHref = useMemo(() => {
     return buildWhatsappUrl({
       phone: WHATS_PHONE,
       text: block,
@@ -327,7 +313,7 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
     });
   }, [block]);
 
-  const onFinishClick = () => { // NEW
+  const onFinishClick = () => {
     // GA4: begin_checkout + generate_lead
     gaEvent("begin_checkout", {
       currency: "BRL",
@@ -393,10 +379,7 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="order-block"
-              className="text-sm text-zinc-700 font-medium"
-            >
+            <label htmlFor="order-block" className="text-sm text-zinc-700 font-medium">
               Resumo do pedido (copiável):
             </label>
             <textarea
@@ -419,7 +402,7 @@ function CartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={onFinishClick} // NEW
+              onClick={onFinishClick}
               className="flex-1 text-center rounded-xl bg-rose-600 text-white hover:bg-rose-700 py-3 text-base font-semibold shadow transition"
             >
               Finalizar pelo WhatsApp
@@ -507,10 +490,7 @@ function PageInner() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-rose-50 to-white">
       {/* Botão flutuante do carrinho */}
-      <CartButtonFloating
-        onClick={() => setOpenCart(true)}
-        itemCount={itemCount}
-      />
+      <CartButtonFloating onClick={() => setOpenCart(true)} itemCount={itemCount} />
       <CartModal open={openCart} onClose={() => setOpenCart(false)} />
 
       {/* Header */}
