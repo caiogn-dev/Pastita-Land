@@ -55,6 +55,7 @@ export const metadata: Metadata = {
     // ➜ use caminhos públicos (raiz) — NÃO "public/..."
     icon: [
       { url: "/favicon.ico" },
+      { url: "https://pastita.com.br/favicon-48x48.png", sizes: "48x48", type: "image/png" }, // explícito e absoluto
       // { url: "/favicon.svg", type: "image/svg+xml" },
     ],
     apple: "/apple-touch-icon.png", // 180x180
