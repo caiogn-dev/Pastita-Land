@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const menus = [
   {
     name: 'Pastita',
-    description: 'Massas artesanais frescas e molhos especiais.',
+    description: 'Massas artesanais frescas e comidas especiais da Chef Ivoneth',
     image: '/pastita-logo.png',
     link: '/cardapio/pastita', // Novo padrão de rota
     width: 200,
