@@ -26,8 +26,6 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    // opcional: ajuda o Google a gerar snippet e prévias de imagem/vídeo
-    // nocache: false,
     // googleBot: "max-snippet:-1, max-image-preview:large, max-video-preview:-1",
   },
   openGraph: {
@@ -52,23 +50,20 @@ export const metadata: Metadata = {
     site: "@pastitamassas",
   },
   icons: {
-    // ➜ use caminhos públicos (raiz) — NÃO "public/..."
+    // use caminhos públicos (raiz). Deixe ambos: local e absoluto ajuda o Google a detectar.
     icon: [
       { url: "/favicon.ico" },
-      { url: "https://pastita.com.br/favicon-48x48.png", sizes: "48x48", type: "image/png" }, // explícito e absoluto
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "https://pastita.com.br/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      // se tiver SVG, ative a linha abaixo:
       // { url: "/favicon.svg", type: "image/svg+xml" },
     ],
     apple: "/apple-touch-icon.png", // 180x180
     shortcut: "/favicon.ico",
-    other: [
-      // opcional para Safari
-      // { rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#5bbad5" },
-    ],
   },
   manifest: "/site.webmanifest",
   verification: {
-    // Se você verificou por DNS, isso é opcional.
-    // Deixe apenas se também quiser verificação por meta tag:
+    // deixe apenas se você também quiser verificação via meta
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 };
@@ -85,6 +80,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Toaster />
         <Footer />
 
+        {/* Site name (SERP) e Organização para o Google */}
+        <Script id="site-name" type="application/ld+json" strategy="afterInteractive">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "url": "https://pastita.com.br/",
+            "name": "Pastita",
+            "alternateName": "Pastita Massas"
+          })}
+        </Script>
+        <Script id="org" type="application/ld+json" strategy="afterInteractive">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Pastita",
+            "url": "https://pastita.com.br/",
+            "logo": "https://pastita.com.br/favicon-48x48.png"
+          })}
+        </Script>
+
+        {/* GA4 */}
         {GA_ID && process.env.NODE_ENV === "production" && (
           <>
             <Script
