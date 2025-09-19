@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   icons: {
     // use caminhos públicos (raiz). Deixe ambos: local e absoluto ajuda o Google a detectar.
     icon: [
-      { url: "/favicon.ico" },
+      { url: "https://pastita.com.br/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
       { url: "https://pastita.com.br/favicon-48x48.png", sizes: "48x48", type: "image/png" },
       // se tiver SVG, ative a linha abaixo:

@@ -1,15 +1,33 @@
 {
+  "id": "/",
   "name": "Pastita Massas",
   "short_name": "Pastita",
+  "description": "Massas artesanais, molhos e marmitas saudáveis da Chef Ivoneth em Palmas-TO. Peça online.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#e11d48",
+  "theme_color": "#7A1A2F",
+  "categories": ["food", "shopping", "lifestyle"],
   "icons": [
     {
-      "src": "/favicon.ico",
+      "src": "/favicon-48x48.png",
       "sizes": "48x48",
-      "type": "image/x-icon"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/ivoneth-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/ivoneth-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
