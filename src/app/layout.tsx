@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     title:
-      "Pastita | Agrião - Cardápio de massas artesanais, marmitas fitness e comida saudável",
+      "Pastita | Agrião",
     description:
       "Pastita e Agrião: massas artesanais, marmitas fitness, comida saudável, delivery em Palmas. Veja o cardápio completo e peça online.",
     images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Logo Pastita Massas" }],
@@ -52,9 +52,8 @@ export const metadata: Metadata = {
   icons: {
     // use caminhos públicos (raiz). Deixe ambos: local e absoluto ajuda o Google a detectar.
     icon: [
-      { url: "https://pastita.com.br/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
-      { url: "https://pastita.com.br/favicon-48x48.png", sizes: "48x48", type: "image/png" },
       // se tiver SVG, ative a linha abaixo:
       // { url: "/favicon.svg", type: "image/svg+xml" },
     ],
