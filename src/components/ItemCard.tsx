@@ -40,13 +40,21 @@ export function ItemCard({ item, theme }: ItemCardProps) {
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-zinc-200/70 shadow-sm bg-white">
-      <div className="aspect-[4/3] w-full bg-zinc-100">
+      <div className={cn(
+        "aspect-[4/3] w-full flex items-center justify-center overflow-hidden rounded-xl",
+        theme === "agriao" ? "bg-green-50" : "bg-zinc-100"
+      )}>
         <Image
           src={item.imageUrl || PLACEHOLDER}
           alt={item.name}
           width={400}
           height={300}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          className={cn(
+            "object-contain shadow-lg transition-transform duration-300",
+            "group-hover:scale-105"
+          )}
+          style={{ aspectRatio: "4/3", background: "transparent" }}
+          priority={false}
         />
       </div>
       <div className="p-4">

@@ -15,6 +15,7 @@ type CartModalProps = {
   theme: "pastita" | "agriao";
 };
 
+
 export function CartModal({ open, onClose, theme }: CartModalProps) {
   // ATUALIZADO: O hook já nos dá o carrinho CERTO para a página atual.
   const { items, total, remove, clear } = useCart(theme);
@@ -47,10 +48,12 @@ export function CartModal({ open, onClose, theme }: CartModalProps) {
 
     const href = buildWhatsappUrl({
       phone: "5563991386719", // SEU NÚMERO DE WHATSAPP
+>>>>>>> dev
       text: message,
     });
     window.open(href, "_blank", "noopener,noreferrer");
   };
+
   
   const themeClasses = {
     pastita: {
@@ -69,7 +72,7 @@ export function CartModal({ open, onClose, theme }: CartModalProps) {
       removeButtonBg: "bg-green-100 hover:bg-green-200",
       removeButtonBorder: "border-green-200",
     },
-  };
+  } as const;
   const classes = themeClasses[theme];
 
   return (
@@ -101,15 +104,32 @@ export function CartModal({ open, onClose, theme }: CartModalProps) {
           </div>
           <div className="flex items-center justify-between px-1">
             <span className="text-lg text-zinc-700 font-medium">Total</span>
+
             <span className={cn("text-2xl font-bold", classes.accentText)}>
-              {total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              {Number(total || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
             </span>
           </div>
+
+
+
           <div className="flex flex-col sm:flex-row gap-2 mt-2">
-            <button onClick={onFinishClick} className={cn("flex-1 text-center rounded-xl text-white py-3 text-base font-semibold shadow transition focus:outline-none focus-visible:ring-2", classes.buttonBg, classes.buttonHoverBg, classes.focusRing)} aria-label="Finalizar pedido pelo WhatsApp">
+            <button
+              onClick={onFinishClick}
+              className={cn(
+                "flex-1 text-center rounded-xl text-white py-3 text-base font-semibold shadow transition focus:outline-none focus-visible:ring-2",
+                classes.buttonBg,
+                classes.buttonHoverBg,
+                classes.focusRing
+              )}
+              aria-label="Finalizar pedido pelo WhatsApp"
+            >
               Finalizar pelo WhatsApp
             </button>
-            <button onClick={clear} className="rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 px-4 py-3 text-base font-semibold border border-zinc-200 shadow transition focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300" aria-label="Limpar carrinho">
+            <button
+              onClick={clear}
+              className="rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 px-4 py-3 text-base font-semibold border border-zinc-200 shadow transition focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300"
+              aria-label="Limpar carrinho"
+            >
               Limpar
             </button>
           </div>
