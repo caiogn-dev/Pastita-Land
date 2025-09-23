@@ -9,7 +9,7 @@ import Script from "next/script";
 import { Suspense } from "react";
 
 const SITE_URL = "https://pastita.com.br";
-const OG_IMAGE = "https://pastita.com.br/pastita-logo.png";
+const OG_IMAGE = "https://pastita.com.br/icons/ivoneth-512.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

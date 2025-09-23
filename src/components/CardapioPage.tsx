@@ -4,14 +4,14 @@
 import React, { useState, useMemo } from "react";
 import { ShoppingCart } from "lucide-react";
 import { type MenuCategory, type MenuItem } from "@/data/menu";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/context/MultiCartContext"; // ATUALIZADO
 import { cn } from "@/lib/utils";
 import { ItemCard } from "@/components/ItemCard";
 import { CartModal } from "@/components/CartModal";
 import { CategoryPill } from "@/components/CategoryPill";
 import ComboModal from "@/components/ComboModal";
 
-// --- Componente Interno para o Botão Flutuante do Carrinho (CORRIGIDO) ---
+// --- Componente do Botão Flutuante do Carrinho (sem alterações) ---
 function CartButtonFloating({ onClick, itemCount, theme }: { onClick: () => void; itemCount: number; theme: "pastita" | "agriao" }) {
   const themeClasses = {
     pastita: {
@@ -54,16 +54,21 @@ function CartButtonFloating({ onClick, itemCount, theme }: { onClick: () => void
   );
 }
 
-// --- Componente Principal da Página de Cardápio ---
+// --- Tipos para as Props ---
+type LojaKey = 'pastita' | 'agriao';
+type ItemComLoja = MenuItem & { loja: LojaKey };
+type CategoriaComLoja = MenuCategory & { items: ItemComLoja[] };
+
 type CardapioPageProps = {
-  theme: "pastita" | "agriao";
-  categories: MenuCategory[];
+  theme: LojaKey;
+  categories: CategoriaComLoja[];
   logoComponent: React.ReactNode;
   switchMenuButton: React.ReactNode;
   headerColor: string;
   headerBorderColor: string;
 };
 
+// --- Componente Principal da Página ---
 export default function CardapioPage({
   theme,
   categories,
@@ -72,7 +77,9 @@ export default function CardapioPage({
   headerColor,
   headerBorderColor,
 }: CardapioPageProps) {
-  const { items, add } = useCart();
+  // ATUALIZADO: O hook agora pega o carrinho correto (pastita ou agriao)
+  const { items, add } = useCart(theme);
+  
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>("todos");
   const [openCart, setOpenCart] = useState(false);
@@ -101,37 +108,33 @@ export default function CardapioPage({
   );
   
   const handleAddCombo = (combo: { rondelli: any; molho: any; sobremesa: any }) => {
-    const comboItem: MenuItem = {
+    const comboItem = {
       id: `combo-${combo.rondelli.id}-${combo.molho.id}-${combo.sobremesa.id}`,
       name: `Combo: ${combo.rondelli.name} + ${combo.molho.name} + ${combo.sobremesa.name}`,
-      description: `Combo personalizado com ${combo.rondelli.name}, molho ${combo.molho.name} e sobremesa ${combo.sobremesa.name}.`,
-      price:
-        Number(combo.rondelli.price || 0) +
-        Number(combo.molho.price || 0) +
-        Number(combo.sobremesa.price || 0),
+      price: Number(combo.rondelli.price || 0) + Number(combo.molho.price || 0) + Number(combo.sobremesa.price || 0),
       imageUrl: combo.rondelli.imageUrl,
       tags: ["combo"],
+      loja: 'pastita' as const,
     };
     add(comboItem);
   };
 
   return (
     <main className={`min-h-screen bg-gradient-to-b from-${theme === 'pastita' ? 'rose' : 'green'}-50 to-white`}>
-      {/* Botões Flutuantes (AGORA INCLUINDO O BOTÃO DO CARRINHO) */}
       <CartButtonFloating onClick={() => setOpenCart(true)} itemCount={itemCount} theme={theme} />
       {switchMenuButton}
 
       {theme === 'pastita' && (
         <>
-            <div className="fixed z-40 bottom-24 right-6 sm:right-8">
-                <button
-                onClick={() => setOpenCombo(true)}
-                className="bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg px-6 py-3 font-bold text-base border-2 border-white focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
-                >
-                Montar Combo
-                </button>
-            </div>
-            <ComboModal open={openCombo} onClose={() => setOpenCombo(false)} onAddCombo={handleAddCombo} />
+          <div className="fixed z-40 bottom-24 right-6 sm:right-8">
+            <button
+              onClick={() => setOpenCombo(true)}
+              className="bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg px-6 py-3 font-bold text-base border-2 border-white focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+            >
+              Montar Combo
+            </button>
+          </div>
+          <ComboModal open={openCombo} onClose={() => setOpenCombo(false)} onAddCombo={handleAddCombo} />
         </>
       )}
 
@@ -186,7 +189,7 @@ export default function CardapioPage({
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
                   {itemsInCategory.map((item) => (
-                    <ItemCard key={item.id} item={item as MenuItem} theme={theme} />
+                    <ItemCard key={item.id} item={item} theme={theme} />
                   ))}
                 </div>
              </div>

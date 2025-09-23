@@ -1,43 +1,38 @@
 // src/components/ItemCard.tsx
+"use client";
+
 import Image from "next/image";
 import { type MenuItem, PLACEHOLDER } from "@/data/menu";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/context/MultiCartContext"; // CORRIGIDO: Importa do novo contexto
 import { cn } from "@/lib/utils";
 
+type LojaKey = "pastita" | "agriao";
+
 type ItemCardProps = {
-  item: MenuItem;
-  theme: "pastita" | "agriao";
+  item: MenuItem & { loja: LojaKey }; // CORRIGIDO: O item agora tem a propriedade 'loja'
+  theme: LojaKey;
 };
 
 export function ItemCard({ item, theme }: ItemCardProps) {
-  const cart = useCart();
+  // CORRIGIDO: Passa o 'theme' para o hook pegar o carrinho correto
+  const cart = useCart(theme);
 
   const themeClasses = {
     pastita: {
       price: "text-rose-600",
-      tagBg: "bg-rose-50",
-      tagText: "text-rose-700",
-      tagBorder: "border-rose-100",
       buttonBorder: "border-rose-600",
       buttonBg: "bg-rose-600",
       buttonText: "text-white",
       buttonHoverBg: "hover:bg-white",
       buttonHoverText: "hover:text-rose-700",
-      buttonHoverBorder: "hover:border-rose-700",
-      focusRing: "focus-visible:ring-rose-300",
     },
     agriao: {
       price: "text-green-800",
-      tagBg: "bg-green-50",
-      tagText: "text-green-700",
-      tagBorder: "border-green-100",
       buttonBorder: "border-green-600",
       buttonBg: "bg-green-600",
       buttonText: "text-white",
       buttonHoverBg: "hover:bg-green-700",
       buttonHoverText: "hover:text-white",
-      buttonHoverBorder: "hover:border-green-700",
-      focusRing: "focus-visible:ring-green-300",
     },
   };
 
@@ -69,31 +64,15 @@ export function ItemCard({ item, theme }: ItemCardProps) {
             {item.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
           </span>
         </div>
-
         {item.description && (
           <p className="mt-1.5 mb-2.5 text-sm text-zinc-600 line-clamp-3">{item.description}</p>
         )}
-
-        {item.tags && item.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {item.tags.map((t) => (
-              <span
-                key={t}
-                className={cn("text-xs px-2 py-1 rounded-full border", classes.tagBg, classes.tagText, classes.tagBorder)}
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
-
         <div className="mt-3">
           <button
             className={cn(
-              "w-full h-11 rounded-xl border-2 active:translate-y-[1px] transition font-semibold tracking-tight focus:outline-none focus-visible:ring-2",
+              "w-full h-11 rounded-xl border-2 active:translate-y-[1px] transition font-semibold",
               classes.buttonBorder, classes.buttonBg, classes.buttonText,
-              classes.buttonHoverBg, classes.buttonHoverText, classes.buttonHoverBorder,
-              classes.focusRing
+              classes.buttonHoverBg, classes.buttonHoverText
             )}
             onClick={() => cart.add(item)}
             aria-label={`Adicionar ${item.name} ao carrinho`}
