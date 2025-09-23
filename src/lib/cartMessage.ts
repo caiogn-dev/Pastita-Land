@@ -1,20 +1,37 @@
 // src/lib/cartMessage.ts
-import { formatBRL } from './formatCurrency';
+<<<<<<< HEAD
+import { calcTotals } from "@/lib/calcTotals";
 
-// Adicione a propriedade 'loja' aos tipos
-export type CartItem = {
-  id: string | number;
+/** Item para Whats/GA */
+export type WhatsItem = {
+  id: string;
   name: string;
-  quantity: number;
   price: number;
-  loja?: 'pastita' | 'agriao';
-  // ... outras propriedades
+  quantity: number;
 };
 
-export type CustomerInfo = { /* ... */ };
+function formatBRL(n: number) {
+  return (Number(n) || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+=======
+import { formatBRL } from './formatCurrency';
+import { CartItem as AppCartItem } from '@/context/CartContext'; // Importando o tipo correto
 
-// Função de agrupamento
-function groupItemsByLoja(items: CartItem[]) {
+// Tipos locais para a função
+export type CartItem = AppCartItem & {
+  quantity: number; // A função original usava 'quantity', vamos manter a compatibilidade
+};
+
+export type CustomerInfo = {
+  nome?: string;
+  telefone?: string;
+  entrega?: 'retirada' | 'delivery';
+  endereco?: string;
+  observacoes?: string;
+};
+
+function groupItemsByLoja(items: AppCartItem[]) {
   return items.reduce((acc, item) => {
     const lojaKey = item.loja || 'outros';
     if (!acc[lojaKey]) {
@@ -22,18 +39,30 @@ function groupItemsByLoja(items: CartItem[]) {
     }
     acc[lojaKey].push(item);
     return acc;
-  }, {} as Record<string, CartItem[]>);
-}
-
-export function cartToGa4Items(items: CartItem[]) {
-    // ... (função existente)
-}
-export function calcTotals(items: CartItem[]) {
-    // ... (função existente)
+  }, {} as Record<string, AppCartItem[]>);
 }
 
 
-export function buildWhatsappMessage({ items, customer }: { items: CartItem[]; customer?: CustomerInfo }) {
+export function cartToGa4Items(items: AppCartItem[]) {
+  return items.map((it, index) => ({
+    item_id: String(it.id),
+    item_name: it.name,
+    index,
+    item_category: (it as any).category || undefined,
+    item_variant: (it as any).variant || undefined,
+    price: Number(it.price.toFixed(2)),
+    quantity: it.qty
+  }));
+}
+
+export function calcTotals(items: AppCartItem[]) {
+  return {
+    subtotal: items.reduce((acc, it) => acc + it.price * it.qty, 0),
+    total: items.reduce((acc, it) => acc + it.price * it.qty, 0),
+  };
+}
+
+export function buildWhatsappMessage({ items, customer }: { items: AppCartItem[]; customer?: CustomerInfo; }) {
   const { total } = calcTotals(items);
   const groupedItems = groupItemsByLoja(items);
   const lojas = Object.keys(groupedItems);
@@ -46,15 +75,84 @@ export function buildWhatsappMessage({ items, customer }: { items: CartItem[]; c
       itemLines.push(`\n*-- Itens ${loja === 'pastita' ? 'Pastita' : 'Agrião'} --*`);
     }
     groupedItems[loja].forEach(it => {
-      const linhaBase = `• ${it.quantity}x ${it.name} — ${formatBRL(it.price * it.quantity)}`;
-      itemLines.push(linhaBase);
+      const linhaBase = `• ${it.qty}x ${it.name} — ${formatBRL(it.price * it.qty)}`;
+      const obs = (it as any).notes ? `\n   obs: ${(it as any).notes}` : '';
+      itemLines.push(linhaBase + obs);
     });
+>>>>>>> dev
   });
+}
 
+<<<<<<< HEAD
+/**
+ * Gera a mensagem do WhatsApp de forma resiliente.
+ * Nunca lança por causa de totals undefined.
+ */
+export function buildWhatsappMessage(opts: {
+  items?: WhatsItem[] | null;
+  title?: string;
+  intro?: string;
+  outro?: string;
+}): string {
+  const safeItems = Array.isArray(opts.items) ? opts.items : [];
+
+  // Usa o calcTotals (que já é seguro e nunca retorna undefined)
+  const totals = calcTotals(
+    safeItems.map((i) => ({ price: i.price, qty: i.quantity }))
+  );
+
+  const lines: string[] = [];
+  if (opts.title) lines.push(`*${opts.title}*`);
+  if (opts.intro) lines.push(opts.intro);
+
+  if (safeItems.length === 0) {
+    lines.push("_Carrinho vazio_");
+  } else {
+    for (const it of safeItems) {
+      const subtotal = Number(it.price || 0) * Number(it.quantity || 0);
+      lines.push(
+        `• ${it.quantity}× ${it.name} — ${formatBRL(it.price)} (subtotal ${formatBRL(
+          subtotal
+        )})`
+      );
+    }
+  }
+
+  // Totais
+  lines.push("");
+  lines.push(`Subtotal: ${formatBRL(totals.subtotal)}`);
+  if ((totals.discount || 0) > 0) {
+    lines.push(`Desconto: -${formatBRL(totals.discount)}`);
+  }
+  lines.push(`*Total: ${formatBRL(totals.total)}*`);
+
+  if (opts.outro) {
+    lines.push("");
+    lines.push(opts.outro);
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * GA4 items seguro.
+ */
+export function cartToGa4Items(items?: WhatsItem[] | null) {
+  const safe = Array.isArray(items) ? items : [];
+  return safe.map((it, index) => ({
+    item_id: String(it.id),
+    item_name: String(it.name ?? ""),
+    price: Number(it.price) || 0,
+    quantity: Number(it.quantity) || 0,
+    index,
+    currency: "BRL",
+  }));
+}
+=======
   const linhas = [
     title,
     '',
-    ...(lojas.length === 1 ? ["*Itens:*"] : []), // Adiciona "Itens:" apenas se for de uma loja só
+    ...(lojas.length === 1 ? ["*Itens:*"] : []),
     ...itemLines,
     '',
     `*Total do Pedido:* ${formatBRL(total)}`,
@@ -62,9 +160,17 @@ export function buildWhatsappMessage({ items, customer }: { items: CartItem[]; c
     '*Dados do cliente:*',
     `Nome: ${customer?.nome || ''}`,
     `Telefone: ${customer?.telefone || ''}`,
-    // ... (resto da lógica)
+    `Entrega: ${customer?.entrega === 'delivery' ? 'Delivery' : 'Retirada'}`,
   ];
+
+  if (customer?.entrega === 'delivery') {
+    linhas.push(`Endereço: ${customer?.endereco || ''}`);
+  }
+  if (customer?.observacoes) {
+    linhas.push(`Obs: ${customer.observacoes}`);
+  }
 
   linhas.push('', 'Pode confirmar por favor? 🙏');
   return linhas.join('\n');
 }
+>>>>>>> dev

@@ -1,11 +1,14 @@
 // src/app/cardapio/pastita/page.tsx
+import { MultiCartProvider } from "@/context/MultiCartContext";
 import CardapioPage from "@/components/CardapioPage";
-import { CartProvider } from "@/context/CartContext";
 import { CATEGORIES as pastitaData } from "@/data/menu";
 import { PastitaLogo } from "@/components/PastitaLogo";
 import { SwitchMenuButton as AgriaoButton } from "@/components/SwitchMenuButton";
 
-// Adicionamos a propriedade 'loja' a cada item do menu
+// Importa e exporta os metadados do arquivo separado
+export { metadata } from './metadata';
+
+// Adiciona a propriedade 'loja' a cada item do menu
 const pastitaMenu = pastitaData.map(category => ({
   ...category,
   items: category.items.map(item => ({ ...item, loja: 'pastita' as const }))
@@ -13,7 +16,7 @@ const pastitaMenu = pastitaData.map(category => ({
 
 export default function PastitaPage() {
   return (
-    <CartProvider>
+    <MultiCartProvider>
       <CardapioPage
         theme="pastita"
         categories={pastitaMenu}
@@ -22,6 +25,6 @@ export default function PastitaPage() {
         headerColor="bg-rose-700/95"
         headerBorderColor="border-rose-800"
       />
-    </CartProvider>
+    </MultiCartProvider>
   );
 }

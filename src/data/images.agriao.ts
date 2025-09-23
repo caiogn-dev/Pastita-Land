@@ -1,0 +1,52 @@
+// Arquivo gerado por scripts/optimize-images.mjs
+export type AgriaoImage = { src: string; width: number; height: number; alt: string };
+export const agriaoImages: AgriaoImage[] = [
+  {
+    "src": "/images/agriao/brasileirissimo.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "brasileirissimo"
+  },
+  {
+    "src": "/images/agriao/cubosFrango-arroz.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "cubosFrango arroz"
+  },
+  {
+    "src": "/images/agriao/EscondidinhoAbobora.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "EscondidinhoAbobora"
+  },
+  {
+    "src": "/images/agriao/grelhadoFrango-pure.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "grelhadoFrango pure"
+  },
+  {
+    "src": "/images/agriao/sobrecoxa-abobrinha.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "sobrecoxa abobrinha"
+  },
+  {
+    "src": "/images/agriao/strogonoffFrango.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "strogonoffFrango"
+  },
+  {
+    "src": "/images/agriao/Tilapia-Tomate.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "Tilapia Tomate"
+  },
+  {
+    "src": "/images/agriao/tirinhaFrango-arroz.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "tirinhaFrango arroz"
+  }
+];

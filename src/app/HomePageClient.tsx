@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PwaInstallCta } from '@/components/PwaInstallCta';
 
 const menus = [
   {
@@ -31,6 +32,9 @@ export default function HomePageClient() {
         <h1 className="text-4xl sm:text-6xl font-extrabold text-green-900 drop-shadow mb-4 text-center">Monte seu pedido!</h1>
         <p className="text-lg sm:text-2xl text-green-700 text-center mb-6">Escolha entre Pastita ou Agrião e aproveite o melhor da comida artesanal e saudável.</p>
       </div>
+
+      <PwaInstallCta />
+      
       {/* Cards dos cardápios */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-3xl">
         {menus.map(menu => (
@@ -54,6 +58,7 @@ export default function HomePageClient() {
           </Link>
         ))}
       </div>
+
       {/* Botão flutuante WhatsApp */}
       <a
         href="https://wa.me/+5563991386719?text=Olá! Gostaria de fazer um pedido."
