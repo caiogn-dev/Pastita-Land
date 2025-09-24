@@ -48,7 +48,6 @@ export function CartModal({ open, onClose, theme }: CartModalProps) {
 
     const href = buildWhatsappUrl({
       phone: "5563991386719", // SEU NÚMERO DE WHATSAPP
->>>>>>> dev
       text: message,
     });
     window.open(href, "_blank", "noopener,noreferrer");

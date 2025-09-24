@@ -16,6 +16,9 @@
 # next.js
 /.next/
 /out/
+#postgresql
+_data/*
+!_data/.gitkeep
 
 # production
 /build
