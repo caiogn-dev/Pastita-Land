@@ -1,16 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server';
+// middleware.ts (na raiz do projeto)
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const url = req.nextUrl;
-  const setIf = (key: string) => {
-    const val = url.searchParams.get(key);
-    if (val) res.cookies.set(key, val, { path: '/', maxAge: 60 * 60 * 24 * 30 });
-  };
-  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(setIf);
-  return res;
+  const { pathname } = req.nextUrl;
+
+  // Ignore assets e APIs do Next
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/assets") ||
+    pathname.startsWith("/favicon")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Se vier com maiúsculas (ex.: /Login), redireciona para minúsculas (/login)
+  const lower = pathname.toLowerCase();
+  if (pathname !== lower) {
+    const url = req.nextUrl.clone();
+    url.pathname = lower;
+    return NextResponse.redirect(url, 301);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ["/:path*"],
 };

@@ -2,9 +2,11 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  // Adicione esta linha:
+  allowedDevOrigins: [
+    "agriao.shop",
+    "www.agriao.shop",
+  ],
   output: 'standalone', 
-  
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -21,6 +23,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-};
+  }
 
 export default nextConfig;

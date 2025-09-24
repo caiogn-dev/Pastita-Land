@@ -16,10 +16,18 @@
 # next.js
 /.next/
 /out/
+#postgresql
+_data/*
+!_data/.gitkeep
 
 # production
 /build
-_data/*
+
+#prisma
+/prisma/migrations
+/prisma/dev.db
+
+
 # misc
 .DS_Store
 *.pem

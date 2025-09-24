@@ -1,4 +1,4 @@
 export const metadata = {
-  title: "Agrião | Cardápio",
-  description: "Veja o cardápio completo da Agrião Marmitas.",
+  title: "Pastita | Cardápio",
+  description: "Veja o cardápio completo da Pastita Massas.",
 };
