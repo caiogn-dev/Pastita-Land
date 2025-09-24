@@ -4,15 +4,24 @@
 import React, { useState, useMemo } from "react";
 import { ShoppingCart } from "lucide-react";
 import { type MenuCategory, type MenuItem } from "@/data/menu";
-import { useCart } from "@/context/MultiCartContext"; // ATUALIZADO
+import { useCart } from "@/context/MultiCartContext";
 import { cn } from "@/lib/utils";
 import { ItemCard } from "@/components/ItemCard";
 import { CartModal } from "@/components/CartModal";
 import { CategoryPill } from "@/components/CategoryPill";
 import ComboModal from "@/components/ComboModal";
+import { useCheckout } from "@/hooks/useCheckout";
 
-// --- Componente do Botão Flutuante do Carrinho (sem alterações) ---
-function CartButtonFloating({ onClick, itemCount, theme }: { onClick: () => void; itemCount: number; theme: "pastita" | "agriao" }) {
+// Botão flutuante do carrinho
+function CartButtonFloating({
+  onClick,
+  itemCount,
+  theme,
+}: {
+  onClick: () => void;
+  itemCount: number;
+  theme: "pastita" | "agriao";
+}) {
   const themeClasses = {
     pastita: {
       buttonBg: "bg-rose-700",
@@ -43,10 +52,12 @@ function CartButtonFloating({ onClick, itemCount, theme }: { onClick: () => void
       <ShoppingCart className="w-6 h-6 mr-2" />
       <span>Carrinho</span>
       {itemCount > 0 && (
-        <span className={cn(
-          "ml-2 bg-white rounded-full px-2 py-0.5 text-xs font-bold min-w-[24px] text-center",
-          classes.countText
-        )}>
+        <span
+          className={cn(
+            "ml-2 bg-white rounded-full px-2 py-0.5 text-xs font-bold min-w-[24px] text-center",
+            classes.countText
+          )}
+        >
           {itemCount}
         </span>
       )}
@@ -54,8 +65,8 @@ function CartButtonFloating({ onClick, itemCount, theme }: { onClick: () => void
   );
 }
 
-// --- Tipos para as Props ---
-type LojaKey = 'pastita' | 'agriao';
+// Tipos
+type LojaKey = "pastita" | "agriao";
 type ItemComLoja = MenuItem & { loja: LojaKey };
 type CategoriaComLoja = MenuCategory & { items: ItemComLoja[] };
 
@@ -68,7 +79,6 @@ type CardapioPageProps = {
   headerBorderColor: string;
 };
 
-// --- Componente Principal da Página ---
 export default function CardapioPage({
   theme,
   categories,
@@ -77,9 +87,11 @@ export default function CardapioPage({
   headerColor,
   headerBorderColor,
 }: CardapioPageProps) {
-  // ATUALIZADO: O hook agora pega o carrinho correto (pastita ou agriao)
+  // carrinho da loja atual
   const { items, add } = useCart(theme);
-  
+  // checkout (salva pedido -> WhatsApp)
+  const { finalize, loading } = useCheckout(theme);
+
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>("todos");
   const [openCart, setOpenCart] = useState(false);
@@ -88,14 +100,19 @@ export default function CardapioPage({
   const itemCount = items.reduce((acc, it) => acc + it.qty, 0);
 
   const flatItems = useMemo(
-    () => categories.flatMap((c) => c.items.map((i) => ({ ...i, __cat: c.title, __catId: c.id }))),
+    () =>
+      categories.flatMap((c) =>
+        c.items.map((i) => ({ ...i, __cat: c.title, __catId: c.id }))
+      ),
     [categories]
   );
 
   const filteredItems = useMemo(() => {
     const q = query.trim().toLowerCase();
     return flatItems.filter((i) => {
-      const matchText = `${i.name} ${i.description ?? ""} ${i.tags?.join(" ") ?? ""} ${i.__cat}`.toLowerCase();
+      const matchText = `${i.name} ${i.description ?? ""} ${
+        i.tags?.join(" ") ?? ""
+      } ${i.__cat}`.toLowerCase();
       const matchQuery = !q || matchText.includes(q);
       const matchCat = activeCat === "todos" || i.__catId === activeCat;
       return matchQuery && matchCat;
@@ -106,25 +123,36 @@ export default function CardapioPage({
     () => (activeCat === "todos" ? categories : categories.filter((c) => c.id === activeCat)),
     [categories, activeCat]
   );
-  
+
   const handleAddCombo = (combo: { rondelli: any; molho: any; sobremesa: any }) => {
     const comboItem = {
       id: `combo-${combo.rondelli.id}-${combo.molho.id}-${combo.sobremesa.id}`,
       name: `Combo: ${combo.rondelli.name} + ${combo.molho.name} + ${combo.sobremesa.name}`,
-      price: Number(combo.rondelli.price || 0) + Number(combo.molho.price || 0) + Number(combo.sobremesa.price || 0),
+      price:
+        Number(combo.rondelli.price || 0) +
+        Number(combo.molho.price || 0) +
+        Number(combo.sobremesa.price || 0),
       imageUrl: combo.rondelli.imageUrl,
       tags: ["combo"],
-      loja: 'pastita' as const,
+      loja: "pastita" as const,
     };
     add(comboItem);
   };
 
   return (
-    <main className={`min-h-screen bg-gradient-to-b from-${theme === 'pastita' ? 'rose' : 'green'}-50 to-white`}>
-      <CartButtonFloating onClick={() => setOpenCart(true)} itemCount={itemCount} theme={theme} />
+    <main
+      className={`min-h-screen bg-gradient-to-b from-${
+        theme === "pastita" ? "rose" : "green"
+      }-50 to-white`}
+    >
+      <CartButtonFloating
+        onClick={() => setOpenCart(true)}
+        itemCount={itemCount}
+        theme={theme}
+      />
       {switchMenuButton}
 
-      {theme === 'pastita' && (
+      {theme === "pastita" && (
         <>
           <div className="fixed z-40 bottom-24 right-6 sm:right-8">
             <button
@@ -134,20 +162,41 @@ export default function CardapioPage({
               Montar Combo
             </button>
           </div>
-          <ComboModal open={openCombo} onClose={() => setOpenCombo(false)} onAddCombo={handleAddCombo} />
+          <ComboModal
+            open={openCombo}
+            onClose={() => setOpenCombo(false)}
+            onAddCombo={handleAddCombo}
+          />
         </>
       )}
 
-      <CartModal open={openCart} onClose={() => setOpenCart(false)} theme={theme} />
-      
-      <header className={cn("sticky top-0 z-30 backdrop-blur border-b shadow-md", headerColor, headerBorderColor)}>
+      {/* CartModal agora recebe onConfirm / confirmLoading */}
+      <CartModal
+        open={openCart}
+        onClose={() => setOpenCart(false)}
+        theme={theme}
+        onConfirm={() => finalize()}     // salva pedido + abre WhatsApp (useCheckout)
+        confirmLoading={loading}
+      />
+
+      <header
+        className={cn(
+          "sticky top-0 z-30 backdrop-blur border-b shadow-md",
+          headerColor,
+          headerBorderColor
+        )}
+      >
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex items-center justify-between gap-4 py-3">
             <div className="flex items-center gap-3">
               <div className="h-10 w-auto">{logoComponent}</div>
               <div className="ml-2">
                 <h1 className="text-lg font-semibold text-white drop-shadow">Cardápio</h1>
-                <p className={`text-xs ${theme === 'pastita' ? 'text-rose-100/90' : 'text-green-200'}`}>
+                <p
+                  className={`text-xs ${
+                    theme === "pastita" ? "text-rose-100/90" : "text-green-200"
+                  }`}
+                >
                   Escolha seus pratos favoritos e monte seu pedido!
                 </p>
               </div>
@@ -158,7 +207,11 @@ export default function CardapioPage({
                 placeholder="Buscar no cardápio..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className={`w-full h-11 rounded-xl border bg-white/95 px-3 text-sm focus:outline-none focus:ring-2 ${theme === 'pastita' ? 'border-rose-200 focus:ring-rose-200' : 'border-green-200 focus:ring-green-200'}`}
+                className={`w-full h-11 rounded-xl border bg-white/95 px-3 text-sm focus:outline-none focus:ring-2 ${
+                  theme === "pastita"
+                    ? "border-rose-200 focus:ring-rose-200"
+                    : "border-green-200 focus:ring-green-200"
+                }`}
               />
             </div>
           </div>
@@ -167,33 +220,57 @@ export default function CardapioPage({
 
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex gap-2 overflow-x-auto py-4">
-          <CategoryPill label="Todos" active={activeCat === "todos"} onClick={() => setActiveCat("todos")} theme={theme} />
+          <CategoryPill
+            label="Todos"
+            active={activeCat === "todos"}
+            onClick={() => setActiveCat("todos")}
+            theme={theme}
+          />
           {categories.map((c) => (
-            <CategoryPill key={c.id} label={c.title} active={activeCat === c.id} onClick={() => setActiveCat(c.id)} theme={theme} />
+            <CategoryPill
+              key={c.id}
+              label={c.title}
+              active={activeCat === c.id}
+              onClick={() => setActiveCat(c.id)}
+              theme={theme}
+            />
           ))}
         </div>
       </div>
-      
+
       <section className="mx-auto max-w-6xl px-4 pb-16">
         {visibleCategories.map((category) => {
-           const itemsInCategory = filteredItems.filter(i => i.__catId === category.id);
-           if (itemsInCategory.length === 0) return null;
+          const itemsInCategory = filteredItems.filter(
+            (i) => i.__catId === category.id
+          );
+          if (itemsInCategory.length === 0) return null;
 
-           return (
-             <div key={category.id} className="py-6" id={category.id}>
-                <div className="flex items-baseline justify-between mb-4">
-                    <h2 className={`text-xl font-semibold ${theme === 'pastita' ? 'text-zinc-900' : 'text-green-900'}`}>{category.title}</h2>
-                    <a href={`#${category.id}`} className={`text-sm ${theme === 'pastita' ? 'text-rose-700' : 'text-green-700'} hover:underline`}>
-                        Ir para seção
-                    </a>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-                  {itemsInCategory.map((item) => (
-                    <ItemCard key={item.id} item={item} theme={theme} />
-                  ))}
-                </div>
-             </div>
-           );
+          return (
+            <div key={category.id} className="py-6" id={category.id}>
+              <div className="flex items-baseline justify-between mb-4">
+                <h2
+                  className={`text-xl font-semibold ${
+                    theme === "pastita" ? "text-zinc-900" : "text-green-900"
+                  }`}
+                >
+                  {category.title}
+                </h2>
+                <a
+                  href={`#${category.id}`}
+                  className={`text-sm ${
+                    theme === "pastita" ? "text-rose-700" : "text-green-700"
+                  } hover:underline`}
+                >
+                  Ir para seção
+                </a>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+                {itemsInCategory.map((item) => (
+                  <ItemCard key={item.id} item={item} theme={theme} />
+                ))}
+              </div>
+            </div>
+          );
         })}
         {filteredItems.length === 0 && (
           <div className="py-20 text-center text-zinc-600">
@@ -201,12 +278,28 @@ export default function CardapioPage({
           </div>
         )}
       </section>
-      
-      <footer className={cn("border-t", theme === 'pastita' ? 'border-zinc-200' : 'border-green-200', "bg-white/70")}>
+
+      <footer
+        className={cn(
+          "border-t",
+          theme === "pastita" ? "border-zinc-200" : "border-green-200",
+          "bg-white/70"
+        )}
+      >
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-zinc-600">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>© {new Date().getFullYear()} {theme === 'pastita' ? 'Pastita Massas' : 'Agrião Marmitas'} — Todos os direitos reservados.</p>
-            <a href="/" className={cn("hover:underline", theme === 'pastita' ? 'text-rose-700' : 'text-green-700')}>
+            <p>
+              © {new Date().getFullYear()}{" "}
+              {theme === "pastita" ? "Pastita Massas" : "Agrião Marmitas"} — Todos os
+              direitos reservados.
+            </p>
+            <a
+              href="/"
+              className={cn(
+                "hover:underline",
+                theme === "pastita" ? "text-rose-700" : "text-green-700"
+              )}
+            >
               Voltar ao início
             </a>
           </div>

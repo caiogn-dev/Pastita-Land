@@ -1,0 +1,78 @@
+services:
+  db:
+    image: postgres:16
+    container_name: pastita_postgres
+    environment:
+      POSTGRES_USER: pastita
+      POSTGRES_PASSWORD: pastita
+      POSTGRES_DB: pastita
+    # Em prod normalmente NÃO expomos a porta do DB
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - ./_data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pastita -d pastita"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      target: builder
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://pastita:pastita@db:5432/pastita?schema=public
+      # Evita problemas de cache do npm dentro do container
+      HOME: "/root"
+      NPM_CONFIG_CACHE: "/tmp/.npm"
+    command: >
+      sh -lc "
+        npx prisma migrate deploy &&
+        npx prisma db seed --if-present
+      "
+    restart: "no"
+
+  web:
+    build:
+      context: .
+      target: runner
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      DATABASE_URL: postgresql://pastita:pastita@db:5432/pastita?schema=public
+      PORT: "3000"
+    ports:
+      - "3000:3000"                 # Cloudflared aponta aqui
+    command: ["node", "server.js"]
+
+  # Prisma Studio (opcional) — só sobe quando usar --profile tools
+  studio:
+    build:
+      context: .
+      target: builder              # precisa do node_modules + prisma CLI
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://pastita:pastita@db:5432/pastita?schema=public
+      HOME: "/root"                # 🔧 corrige npx/npm
+      NPM_CONFIG_CACHE: "/tmp/.npm"
+    ports:
+      - "5555:5555"
+    command: >
+      sh -lc "npx prisma generate &&
+              npx prisma studio --hostname 0.0.0.0 --port 5555 --browser none"
+    profiles: ["tools"]            # ← não inicia por padrão
