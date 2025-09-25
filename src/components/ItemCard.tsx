@@ -2,77 +2,89 @@
 "use client";
 
 import Image from "next/image";
+import { useMemo, useState } from "react";
 import { type MenuItem, PLACEHOLDER } from "@/data/menu";
-import { useCart } from "@/context/MultiCartContext"; // CORRIGIDO: Importa do novo contexto
+import { useCart } from "@/context/MultiCartContext";
 import { cn } from "@/lib/utils";
+import { shimmer } from "@/lib/shimmer";
+// (opcional) se quiser mapear dimensões conhecidas sem mexer no DB:
+import { agriaoImages } from "@/data/images.agriao"; // [{src,width,height}]
 
 type LojaKey = "pastita" | "agriao";
+type ItemWithOptDims = MenuItem & { loja: LojaKey; imageWidth?: number; imageHeight?: number };
 
-type ItemCardProps = {
-  item: MenuItem & { loja: LojaKey }; // CORRIGIDO: O item agora tem a propriedade 'loja'
-  theme: LojaKey;
-};
+function findDimsBySrc(src?: string) {
+  if (!src) return null;
+  const hit = agriaoImages.find(i => i.src === src);
+  return hit ? { w: hit.width, h: hit.height } : null;
+}
 
-export function ItemCard({ item, theme }: ItemCardProps) {
-  // CORRIGIDO: Passa o 'theme' para o hook pegar o carrinho correto
+export function ItemCard({ item, theme, priority = false }: { item: ItemWithOptDims; theme: LojaKey; priority?: boolean; }) {
   const cart = useCart(theme);
+  const [imgError, setImgError] = useState(false);
 
-  const themeClasses = {
-    pastita: {
-      price: "text-rose-600",
-      buttonBorder: "border-rose-600",
-      buttonBg: "bg-rose-600",
-      buttonText: "text-white",
-      buttonHoverBg: "hover:bg-white",
-      buttonHoverText: "hover:text-rose-700",
-    },
-    agriao: {
-      price: "text-green-800",
-      buttonBorder: "border-green-600",
-      buttonBg: "bg-green-600",
-      buttonText: "text-white",
-      buttonHoverBg: "hover:bg-green-700",
-      buttonHoverText: "hover:text-white",
-    },
-  };
+  const src = useMemo(() => {
+    const raw = (item.imageUrl ?? "").trim();
+    return imgError ? PLACEHOLDER : (raw || PLACEHOLDER);
+  }, [item.imageUrl, imgError]);
 
-  const classes = themeClasses[theme];
+  // 1) tenta usar dimensões vindas do banco
+  // 2) senão, tenta achar em agriaoImages
+  // 3) fallback para 4/3
+  const { w, h } = useMemo(() => {
+    if (item.imageWidth && item.imageHeight) return { w: item.imageWidth, h: item.imageHeight };
+    const fromMap = findDimsBySrc(item.imageUrl);
+    if (fromMap) return { w: fromMap.w, h: fromMap.h };
+    return { w: 4, h: 3 }; // fallback
+  }, [item.imageWidth, item.imageHeight, item.imageUrl]);
+
+  const blurDataURL = useMemo(
+    () => shimmer(theme === "agriao" ? "#e6f4ea" : "#fde2e7"),
+    [theme]
+  );
+
+  const themeColors = theme === "agriao"
+    ? { price: "text-green-800", bg: "bg-green-50", btnBorder: "border-green-600", btnBg: "bg-green-600", btnText: "text-white", btnHoverBg: "hover:bg-green-700", btnHoverText: "hover:text-white" }
+    : { price: "text-rose-600",  bg: "bg-rose-50",  btnBorder: "border-rose-600",  btnBg: "bg-rose-600",  btnText: "text-white", btnHoverBg: "hover:bg-white",       btnHoverText: "hover:text-rose-700" };
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-zinc-200/70 shadow-sm bg-white">
-      <div className={cn(
-        "aspect-[4/3] w-full flex items-center justify-center overflow-hidden rounded-xl",
-        theme === "agriao" ? "bg-green-50" : "bg-zinc-100"
-      )}>
+      {/* Container com proporção EXATA da imagem */}
+      <div
+        className={cn("relative w-full overflow-hidden rounded-xl", themeColors.bg)}
+        style={{ aspectRatio: `${w} / ${h}` }} // <-- magia aqui
+      >
         <Image
-          src={item.imageUrl || PLACEHOLDER}
+          src={src}
           alt={item.name}
-          width={400}
-          height={300}
-          className={cn(
-            "object-contain shadow-lg transition-transform duration-300",
-            "group-hover:scale-105"
-          )}
-          style={{ aspectRatio: "4/3", background: "transparent" }}
-          priority={false}
+          fill
+          className="object-contain"       // sem crop, sem zoom
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          placeholder="blur"
+          blurDataURL={blurDataURL}
+          priority={priority}
+          onError={() => !imgError && setImgError(true)}
         />
       </div>
+
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-semibold text-zinc-900 leading-tight">{item.name}</h3>
-          <span className={cn("font-semibold", classes.price)}>
+          <span className={cn("font-semibold whitespace-nowrap", themeColors.price)}>
             {item.price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
           </span>
         </div>
+
         {item.description && (
           <p className="mt-1.5 mb-2.5 text-sm text-zinc-600 line-clamp-3">{item.description}</p>
         )}
+
         <div className="mt-3">
           <button
             className={cn(
               "w-full h-11 rounded-xl border-2 active:translate-y-[1px] transition font-semibold",
-              classes.buttonBorder, classes.buttonBg, classes.buttonText,
-              classes.buttonHoverBg, classes.buttonHoverText
+              themeColors.btnBorder, themeColors.btnBg, themeColors.btnText,
+              themeColors.btnHoverBg, themeColors.btnHoverText
             )}
             onClick={() => cart.add(item)}
             aria-label={`Adicionar ${item.name} ao carrinho`}

@@ -2,8 +2,8 @@
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+  "prisma": { 
+    "seed": "node prisma/seed.js" 
   },
   "scripts": {
     "dev": "next dev --turbopack -p 3000",

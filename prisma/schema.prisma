@@ -1,0 +1,200 @@
+// prisma/schema.prisma
+generator client {
+  provider      = "prisma-client-js"
+  // Se você estiver rodando em Debian/Bookworm (node:18/20-slim), é bom fixar:
+  // (rode `npx prisma generate` após mudar)
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/**
+ * OBS: Você usa @db.Citext (case-insensitive). Garanta a extensão no Postgres:
+ *   CREATE EXTENSION IF NOT EXISTS citext;
+ * Faça isso uma vez no banco (ou via init script).
+ */
+
+/* ===========================
+   Usuários / Auth (NextAuth v4)
+   =========================== */
+
+enum Role {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+model User {
+  id               String    @id @default(cuid())
+  name             String?
+  email            String    @unique @db.Citext
+  emailVerified    DateTime?
+  phone            String?   @unique
+  avatarUrl        String?
+  role             Role      @default(CUSTOMER)
+
+  passwordHash     String?   // pode ser null se usar só OAuth
+  twoFactorEnabled Boolean    @default(false)
+  twoFactorSecret  String?
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // NextAuth
+  accounts         Account[]
+  sessions         Session[]
+
+  // Pedidos vinculados ao usuário (opcional)
+  orders           Order[]
+}
+
+model Account {
+  id                 String   @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+/* ===========================
+   Menus / Categorias / Itens
+   =========================== */
+
+model Menu {
+  id         String         @id @default(cuid())
+  name       String
+  slug       String         @unique  // "pastita" | "agriao"
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  categories MenuCategory[]
+
+  @@index([slug])
+}
+
+model MenuCategory {
+  id         String      @id @default(cuid())
+  title      String
+  slug       String
+  sortOrder  Int         @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  // Relação com Menu
+  menuId String
+  menu   Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  items  MenuItem[]
+
+  @@unique([menuId, slug])        // slug único por menu
+  @@index([menuId, sortOrder])
+}
+
+model MenuItem {
+  id           String       @id @default(cuid())
+  name         String
+  slug         String                    // "escondidinho-abobora-frango"
+  description  String?
+  imageUrl     String?
+  priceCents   Int                       // preço em centavos
+  tags         String[]     @default([]) // array de texto (Postgres)
+  isActive     Boolean      @default(true)
+  sortOrder    Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Relação com Categoria
+  categoryId String
+  category   MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, slug])   // slug único dentro da categoria
+  @@index([categoryId, sortOrder])
+}
+
+/* ===========================
+   Pedidos
+   =========================== */
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  DELIVERED
+}
+
+enum Brand {
+  pastita
+  agriao
+}
+
+model Order {
+  id            String       @id @default(cuid())
+  brand         Brand
+  status        OrderStatus  @default(PENDING)
+  totalCents    Int
+  notes         String?
+  createdAt     DateTime     @default(now())
+
+  // Relacionamento com usuário logado (opcional)
+  userId        String?
+  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Contato do cliente (para quando não estiver logado ou para registro de entrega)
+  contactName   String?
+  contactEmail  String?      @db.Citext
+  contactPhone  String?
+
+  items         OrderItem[]
+
+  @@index([brand, status, createdAt])
+  @@index([userId])
+}
+
+model OrderItem {
+  id              String   @id @default(cuid())
+
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Snapshot dos dados do item (evita preço mudar depois)
+  itemSlug        String
+  itemName        String
+  unitPriceCents  Int
+  qty             Int      @default(1)
+  imageUrl        String?
+
+  // Campos opcionais caso queira referenciar depois o catálogo
+  categoryId      String?
+  menuItemId      String?
+}
