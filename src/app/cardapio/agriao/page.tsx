@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   twitter: { title: "Agrião | Cardápio" },
 };
 
-export default async function AgriaoPage() {
-  const { categories } = await loadMenuByBrand("agriao"); // 🔥 agora vem do DB
 
+export default async function AgriaoPage() {
+  const { categories } = await loadMenuByBrand("agriao");
   return (
     <MultiCartProvider>
       <CardapioPage

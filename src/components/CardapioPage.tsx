@@ -10,9 +10,11 @@ import { ItemCard } from "@/components/ItemCard";
 import { CartModal } from "@/components/CartModal";
 import { CategoryPill } from "@/components/CategoryPill";
 import ComboModal from "@/components/ComboModal";
-import { useCheckout } from "@/hooks/useCheckout";
 
-// Botão flutuante do carrinho
+type LojaKey = "pastita" | "agriao";
+type ItemComLoja = MenuItem & { loja: LojaKey; __cat?: string; __catId?: string };
+type CategoriaComLoja = MenuCategory & { items: ItemComLoja[] };
+
 function CartButtonFloating({
   onClick,
   itemCount,
@@ -20,7 +22,7 @@ function CartButtonFloating({
 }: {
   onClick: () => void;
   itemCount: number;
-  theme: "pastita" | "agriao";
+  theme: LojaKey;
 }) {
   const themeClasses = {
     pastita: {
@@ -35,7 +37,7 @@ function CartButtonFloating({
       focusRing: "focus-visible:ring-green-300",
       countText: "text-green-700",
     },
-  };
+  } as const;
   const classes = themeClasses[theme];
 
   return (
@@ -65,11 +67,6 @@ function CartButtonFloating({
   );
 }
 
-// Tipos
-type LojaKey = "pastita" | "agriao";
-type ItemComLoja = MenuItem & { loja: LojaKey };
-type CategoriaComLoja = MenuCategory & { items: ItemComLoja[] };
-
 type CardapioPageProps = {
   theme: LojaKey;
   categories: CategoriaComLoja[];
@@ -87,10 +84,7 @@ export default function CardapioPage({
   headerColor,
   headerBorderColor,
 }: CardapioPageProps) {
-  // carrinho da loja atual
   const { items, add } = useCart(theme);
-  // checkout (salva pedido -> WhatsApp)
-  const { finalize, loading } = useCheckout(theme);
 
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>("todos");
@@ -120,12 +114,15 @@ export default function CardapioPage({
   }, [flatItems, query, activeCat]);
 
   const visibleCategories = useMemo(
-    () => (activeCat === "todos" ? categories : categories.filter((c) => c.id === activeCat)),
+    () =>
+      activeCat === "todos"
+        ? categories
+        : categories.filter((c) => c.id === activeCat),
     [categories, activeCat]
   );
 
   const handleAddCombo = (combo: { rondelli: any; molho: any; sobremesa: any }) => {
-    const comboItem = {
+    const comboItem: ItemComLoja = {
       id: `combo-${combo.rondelli.id}-${combo.molho.id}-${combo.sobremesa.id}`,
       name: `Combo: ${combo.rondelli.name} + ${combo.molho.name} + ${combo.sobremesa.name}`,
       price:
@@ -134,16 +131,17 @@ export default function CardapioPage({
         Number(combo.sobremesa.price || 0),
       imageUrl: combo.rondelli.imageUrl,
       tags: ["combo"],
-      loja: "pastita" as const,
+      loja: "pastita",
     };
     add(comboItem);
   };
 
   return (
     <main
-      className={`min-h-screen bg-gradient-to-b from-${
-        theme === "pastita" ? "rose" : "green"
-      }-50 to-white`}
+      className={cn(
+        "min-h-screen bg-gradient-to-b to-white",
+        theme === "pastita" ? "from-rose-50" : "from-green-50"
+      )}
     >
       <CartButtonFloating
         onClick={() => setOpenCart(true)}
@@ -170,13 +168,10 @@ export default function CardapioPage({
         </>
       )}
 
-      {/* CartModal agora recebe onConfirm / confirmLoading */}
       <CartModal
         open={openCart}
         onClose={() => setOpenCart(false)}
         theme={theme}
-        onConfirm={() => finalize()}     // salva pedido + abre WhatsApp (useCheckout)
-        confirmLoading={loading}
       />
 
       <header
@@ -191,11 +186,14 @@ export default function CardapioPage({
             <div className="flex items-center gap-3">
               <div className="h-10 w-auto">{logoComponent}</div>
               <div className="ml-2">
-                <h1 className="text-lg font-semibold text-white drop-shadow">Cardápio</h1>
+                <h1 className="text-lg font-semibold text-white drop-shadow">
+                  Cardápio
+                </h1>
                 <p
-                  className={`text-xs ${
+                  className={cn(
+                    "text-xs",
                     theme === "pastita" ? "text-rose-100/90" : "text-green-200"
-                  }`}
+                  )}
                 >
                   Escolha seus pratos favoritos e monte seu pedido!
                 </p>
@@ -207,11 +205,12 @@ export default function CardapioPage({
                 placeholder="Buscar no cardápio..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className={`w-full h-11 rounded-xl border bg-white/95 px-3 text-sm focus:outline-none focus:ring-2 ${
+                className={cn(
+                  "w-full h-11 rounded-xl border bg-white/95 px-3 text-sm focus:outline-none focus:ring-2",
                   theme === "pastita"
                     ? "border-rose-200 focus:ring-rose-200"
                     : "border-green-200 focus:ring-green-200"
-                }`}
+                )}
               />
             </div>
           </div>
@@ -239,7 +238,7 @@ export default function CardapioPage({
       </div>
 
       <section className="mx-auto max-w-6xl px-4 pb-16">
-        {visibleCategories.map((category) => {
+        {visibleCategories.map((category, catIndex) => {
           const itemsInCategory = filteredItems.filter(
             (i) => i.__catId === category.id
           );
@@ -249,24 +248,33 @@ export default function CardapioPage({
             <div key={category.id} className="py-6" id={category.id}>
               <div className="flex items-baseline justify-between mb-4">
                 <h2
-                  className={`text-xl font-semibold ${
+                  className={cn(
+                    "text-xl font-semibold",
                     theme === "pastita" ? "text-zinc-900" : "text-green-900"
-                  }`}
+                  )}
                 >
                   {category.title}
                 </h2>
                 <a
                   href={`#${category.id}`}
-                  className={`text-sm ${
+                  className={cn(
+                    "text-sm hover:underline",
                     theme === "pastita" ? "text-rose-700" : "text-green-700"
-                  } hover:underline`}
+                  )}
                 >
                   Ir para seção
                 </a>
               </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-                {itemsInCategory.map((item) => (
-                  <ItemCard key={item.id} item={item} theme={theme} />
+                {itemsInCategory.map((item, idx) => (
+                  <ItemCard
+                    key={item.id}
+                    item={item}
+                    theme={theme}
+                    // prioridade apenas para as 2 primeiras imagens da primeira seção visível
+                    priority={theme === "agriao" && catIndex === 0 && idx < 2}
+                  />
                 ))}
               </div>
             </div>
@@ -274,16 +282,15 @@ export default function CardapioPage({
         })}
         {filteredItems.length === 0 && (
           <div className="py-20 text-center text-zinc-600">
-            Nenhum item encontrado para "{query}".
+            Nenhum item encontrado para &quot;{query}&quot;.
           </div>
         )}
       </section>
 
       <footer
         className={cn(
-          "border-t",
-          theme === "pastita" ? "border-zinc-200" : "border-green-200",
-          "bg-white/70"
+          "border-t bg-white/70",
+          theme === "pastita" ? "border-zinc-200" : "border-green-200"
         )}
       >
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-zinc-600">
