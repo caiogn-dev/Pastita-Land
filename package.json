@@ -2,8 +2,8 @@
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
-  "prisma": { 
-    "seed": "node prisma/seed.js" 
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "scripts": {
     "dev": "next dev --turbopack -p 3000",
@@ -44,7 +44,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.475.0",
-    "next": "^15.3.3",
+    "next": "15.3.8",
     "next-auth": "^4.24.11",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",
